@@ -1,0 +1,305 @@
+<html>
+<head>
+    <title>Channels Settings</title>
+    <script type="module">
+        import { store } from "/components/plugins/plugin-settings-store.js";
+    </script>
+    <style>
+        .ch-cfg { font-family: system-ui, -apple-system, sans-serif; color: inherit; }
+        .ch-cfg-field { margin-bottom: 16px; }
+        .ch-cfg-label { display: block; font-size: 0.85em; font-weight: 500; margin-bottom: 4px; }
+        .ch-cfg-hint { font-size: 0.72em; opacity: 0.5; margin-top: 3px; }
+        .ch-cfg-input { width: 100%; padding: 7px 10px; border-radius: 6px; border: 1px solid color-mix(in srgb, currentColor 18%, transparent); background: color-mix(in srgb, currentColor 5%, transparent); color: inherit; font-size: 0.85em; font-family: 'SF Mono', 'Fira Code', monospace; box-sizing: border-box; }
+        .ch-cfg-input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 2px #6366f133; }
+        .ch-cfg-input::placeholder { opacity: 0.35; }
+        .ch-cfg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .ch-cfg-toggle { display: flex; align-items: center; gap: 8px; font-size: 0.85em; cursor: pointer; }
+        .ch-cfg-section { font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.4; margin: 20px 0 10px 0; padding-bottom: 4px; border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent); }
+        .ch-cfg-section:first-child { margin-top: 0; }
+        .ch-cfg-platform { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .ch-cfg-badge { padding: 2px 8px; border-radius: 4px; font-size: 0.7em; font-weight: 600; color: white; }
+        .ch-tg-bg { background: #0088cc; }
+        .ch-dc-bg { background: #5865f2; }
+        .ch-wa-bg { background: #25d366; }
+    </style>
+</head>
+<body>
+    <div x-data class="ch-cfg">
+        <template x-if="$store.pluginSettings && $store.pluginSettings.settings">
+            <div>
+                <!-- General -->
+                <div class="ch-cfg-section">General</div>
+
+                <div class="ch-cfg-field">
+                    <label class="ch-cfg-toggle">
+                        <input type="checkbox"
+                               x-model="$store.pluginSettings.settings.auto_start" />
+                        Auto-start bus on first agent message
+                    </label>
+                </div>
+
+                <div class="ch-cfg-field">
+                    <label class="ch-cfg-label">History per conversation</label>
+                    <input type="number" class="ch-cfg-input"
+                           x-model.number="$store.pluginSettings.settings.history_per_conversation"
+                           placeholder="50" min="10" max="500" />
+                    <div class="ch-cfg-hint">Max messages kept in memory per conversation</div>
+                </div>
+
+                <!-- Telegram -->
+                <div class="ch-cfg-section">
+                    <div class="ch-cfg-platform">
+                        <span class="ch-cfg-badge ch-tg-bg">TG</span> Telegram
+                    </div>
+                </div>
+
+                <div class="ch-cfg-field">
+                    <label class="ch-cfg-toggle">
+                        <input type="checkbox"
+                               x-model="$store.pluginSettings.settings.telegram_enabled" />
+                        Enable Telegram adapter
+                    </label>
+                </div>
+
+                <div class="ch-cfg-field">
+                    <label class="ch-cfg-label">Bot Token</label>
+                    <input type="password" class="ch-cfg-input"
+                           x-model="$store.pluginSettings.settings.telegram_bot_token"
+                           placeholder="123456:ABC-DEF..." />
+                    <div class="ch-cfg-hint">From @BotFather on Telegram</div>
+                </div>
+
+                <div class="ch-cfg-row">
+                    <div class="ch-cfg-field">
+                        <label class="ch-cfg-label">Allowed Chats</label>
+                        <input type="text" class="ch-cfg-input"
+                               x-model="$store.pluginSettings.settings.telegram_allowed_chats"
+                               placeholder="All chats" />
+                        <div class="ch-cfg-hint">Comma-separated chat IDs. Empty = all.</div>
+                    </div>
+                    <div class="ch-cfg-field">
+                        <label class="ch-cfg-label">Parse Mode</label>
+                        <select class="ch-cfg-input"
+                                x-model="$store.pluginSettings.settings.telegram_parse_mode">
+                            <option value="Markdown">Markdown</option>
+                            <option value="HTML">HTML</option>
+                            <option value="MarkdownV2">MarkdownV2</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Telegram Behavior -->
+                <div class="ch-cfg-section" style="margin-top:14px; opacity:0.3; font-size:0.65em;">Behavior</div>
+
+                <div class="ch-cfg-row">
+                    <div class="ch-cfg-field">
+                        <label class="ch-cfg-toggle">
+                            <input type="checkbox"
+                                   x-model="$store.pluginSettings.settings.telegram_typing_enabled" />
+                            Show typing indicator
+                        </label>
+                    </div>
+                    <div class="ch-cfg-field">
+                        <label class="ch-cfg-toggle">
+                            <input type="checkbox"
+                                   x-model="$store.pluginSettings.settings.telegram_reaction_enabled" />
+                            Reaction lifecycle
+                        </label>
+                    </div>
+                </div>
+
+                <div class="ch-cfg-row" x-show="$store.pluginSettings.settings.telegram_reaction_enabled">
+                    <div class="ch-cfg-field">
+                        <label class="ch-cfg-label">Seen / Processing</label>
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" class="ch-cfg-input" style="width:50%; text-align:center;"
+                                   x-model="$store.pluginSettings.settings.telegram_reaction_seen"
+                                   placeholder="👀" />
+                            <input type="text" class="ch-cfg-input" style="width:50%; text-align:center;"
+                                   x-model="$store.pluginSettings.settings.telegram_reaction_processing"
+                                   placeholder="🤔" />
+                        </div>
+                    </div>
+                    <div class="ch-cfg-field">
+                        <label class="ch-cfg-label">Done / Error</label>
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" class="ch-cfg-input" style="width:50%; text-align:center;"
+                                   x-model="$store.pluginSettings.settings.telegram_reaction_done"
+                                   placeholder="👍" />
+                            <input type="text" class="ch-cfg-input" style="width:50%; text-align:center;"
+                                   x-model="$store.pluginSettings.settings.telegram_reaction_error"
+                                   placeholder="💔" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ch-cfg-field">
+                    <label class="ch-cfg-label">Response Mode</label>
+                    <select class="ch-cfg-input"
+                            x-model="$store.pluginSettings.settings.telegram_response_mode">
+                        <option value="auto">Auto (DMs=all, groups=mentions)</option>
+                        <option value="all">All messages</option>
+                        <option value="mentions">@mentions only</option>
+                        <option value="replies">Replies to bot only</option>
+                        <option value="commands_only">Commands only (/cmd)</option>
+                    </select>
+                    <div class="ch-cfg-hint">Controls when the bot responds in groups</div>
+                </div>
+
+                <!-- Telegram Connection -->
+                <div class="ch-cfg-section" style="margin-top:14px; opacity:0.3; font-size:0.65em;">Connection</div>
+
+                <div class="ch-cfg-field">
+                    <label class="ch-cfg-label">Webhook URL</label>
+                    <input type="text" class="ch-cfg-input"
+                           x-model="$store.pluginSettings.settings.telegram_webhook_url"
+                           placeholder="Leave empty for long-polling" />
+                    <div class="ch-cfg-hint">HTTPS URL for webhook mode. Empty = long-polling (default).</div>
+                </div>
+
+                <div class="ch-cfg-row" x-show="$store.pluginSettings.settings.telegram_webhook_url">
+                    <div class="ch-cfg-field">
+                        <label class="ch-cfg-label">Webhook Port</label>
+                        <input type="number" class="ch-cfg-input"
+                               x-model.number="$store.pluginSettings.settings.telegram_webhook_port"
+                               placeholder="8443" min="1024" max="65535" />
+                    </div>
+                    <div class="ch-cfg-field">
+                        <label class="ch-cfg-label">Webhook Path</label>
+                        <input type="text" class="ch-cfg-input"
+                               x-model="$store.pluginSettings.settings.telegram_webhook_path"
+                               placeholder="/webhook/telegram" />
+                    </div>
+                </div>
+
+                <!-- Telegram Commands -->
+                <div class="ch-cfg-section" style="margin-top:14px; opacity:0.3; font-size:0.65em;">Bot Commands</div>
+
+                <div class="ch-cfg-field">
+                    <label class="ch-cfg-label">Commands (JSON)</label>
+                    <textarea class="ch-cfg-input" rows="3" style="font-size:0.8em; resize:vertical;"
+                              x-model="$store.pluginSettings.settings.telegram_commands"
+                              placeholder='[{"command":"help","description":"Show help"}]'></textarea>
+                    <div class="ch-cfg-hint">JSON array of {command, description}. Registered with BotFather on connect.</div>
+                </div>
+
+                <div class="ch-cfg-field">
+                    <label class="ch-cfg-label">Handle internally</label>
+                    <input type="text" class="ch-cfg-input"
+                           x-model="$store.pluginSettings.settings.telegram_handle_commands_internally"
+                           placeholder="help,status,forget" />
+                    <div class="ch-cfg-hint">Comma-separated commands handled by plugin (not forwarded to agent)</div>
+                </div>
+
+                <!-- Telegram Rate Limits -->
+                <div class="ch-cfg-section" style="margin-top:14px; opacity:0.3; font-size:0.65em;">Rate Limits</div>
+
+                <div class="ch-cfg-row">
+                    <div class="ch-cfg-field">
+                        <label class="ch-cfg-label">User cooldown (sec)</label>
+                        <input type="number" class="ch-cfg-input"
+                               x-model.number="$store.pluginSettings.settings.telegram_cooldown_seconds"
+                               placeholder="0" min="0" />
+                        <div class="ch-cfg-hint">Per-user cooldown between messages. 0 = off.</div>
+                    </div>
+                    <div class="ch-cfg-field">
+                        <label class="ch-cfg-label">Max concurrent</label>
+                        <input type="number" class="ch-cfg-input"
+                               x-model.number="$store.pluginSettings.settings.telegram_max_concurrent"
+                               placeholder="3" min="1" max="20" />
+                        <div class="ch-cfg-hint">Max parallel agent contexts</div>
+                    </div>
+                </div>
+
+                <!-- Discord -->
+                <div class="ch-cfg-section">
+                    <div class="ch-cfg-platform">
+                        <span class="ch-cfg-badge ch-dc-bg">DC</span> Discord
+                    </div>
+                </div>
+
+                <div class="ch-cfg-field">
+                    <label class="ch-cfg-toggle">
+                        <input type="checkbox"
+                               x-model="$store.pluginSettings.settings.discord_enabled" />
+                        Enable Discord adapter
+                    </label>
+                </div>
+
+                <div class="ch-cfg-field">
+                    <label class="ch-cfg-label">Bot Token</label>
+                    <input type="password" class="ch-cfg-input"
+                           x-model="$store.pluginSettings.settings.discord_bot_token"
+                           placeholder="MTk1NTM..." />
+                    <div class="ch-cfg-hint">From Discord Developer Portal</div>
+                </div>
+
+                <div class="ch-cfg-row">
+                    <div class="ch-cfg-field">
+                        <label class="ch-cfg-label">Allowed Guilds</label>
+                        <input type="text" class="ch-cfg-input"
+                               x-model="$store.pluginSettings.settings.discord_allowed_guilds"
+                               placeholder="All guilds" />
+                        <div class="ch-cfg-hint">Comma-separated guild IDs. Empty = all.</div>
+                    </div>
+                    <div class="ch-cfg-field">
+                        <label class="ch-cfg-label">Allowed Channels</label>
+                        <input type="text" class="ch-cfg-input"
+                               x-model="$store.pluginSettings.settings.discord_allowed_channels"
+                               placeholder="All channels" />
+                        <div class="ch-cfg-hint">Comma-separated channel IDs. Empty = all.</div>
+                    </div>
+                </div>
+
+                <!-- WhatsApp -->
+                <div class="ch-cfg-section">
+                    <div class="ch-cfg-platform">
+                        <span class="ch-cfg-badge ch-wa-bg">WA</span> WhatsApp
+                    </div>
+                </div>
+
+                <div class="ch-cfg-field">
+                    <label class="ch-cfg-toggle">
+                        <input type="checkbox"
+                               x-model="$store.pluginSettings.settings.whatsapp_enabled" />
+                        Enable WhatsApp adapter
+                    </label>
+                </div>
+
+                <div class="ch-cfg-row">
+                    <div class="ch-cfg-field">
+                        <label class="ch-cfg-label">Phone Number ID</label>
+                        <input type="text" class="ch-cfg-input"
+                               x-model="$store.pluginSettings.settings.whatsapp_phone_id"
+                               placeholder="101234567890" />
+                        <div class="ch-cfg-hint">WhatsApp Business API phone ID</div>
+                    </div>
+                    <div class="ch-cfg-field">
+                        <label class="ch-cfg-label">Webhook Port</label>
+                        <input type="number" class="ch-cfg-input"
+                               x-model.number="$store.pluginSettings.settings.whatsapp_webhook_port"
+                               placeholder="8402" min="1024" max="65535" />
+                        <div class="ch-cfg-hint">Port for incoming webhooks</div>
+                    </div>
+                </div>
+
+                <div class="ch-cfg-field">
+                    <label class="ch-cfg-label">Access Token</label>
+                    <input type="password" class="ch-cfg-input"
+                           x-model="$store.pluginSettings.settings.whatsapp_access_token"
+                           placeholder="EAABsbC..." />
+                    <div class="ch-cfg-hint">From Meta Developer Portal</div>
+                </div>
+
+                <div class="ch-cfg-field">
+                    <label class="ch-cfg-label">Verify Token</label>
+                    <input type="text" class="ch-cfg-input"
+                           x-model="$store.pluginSettings.settings.whatsapp_verify_token"
+                           placeholder="my-verify-token" />
+                    <div class="ch-cfg-hint">Used for webhook verification handshake</div>
+                </div>
+            </div>
+        </template>
+    </div>
+</body>
+</html>

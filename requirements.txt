@@ -1,0 +1,11 @@
+# Channels plugin dependencies — install in the A0 container:
+#   pip install -r usr/plugins/channels/requirements.txt
+
+# Telegram adapter
+aiogram>=3.10,<4.0
+
+# Discord adapter
+discord.py>=2.3,<3.0
+
+# WhatsApp adapter — uses aiohttp (already in A0 core) for webhook server
+# No additional dependency needed

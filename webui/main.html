@@ -1,0 +1,179 @@
+<html>
+<head>
+    <title>Channels</title>
+    <script type="module" src="/plugins/channels/webui/channels-store.js"></script>
+    <style>
+        .ch { font-family: system-ui, -apple-system, sans-serif; color: inherit; }
+        .ch-card { background: color-mix(in srgb, currentColor 8%, transparent); border: 1px solid color-mix(in srgb, currentColor 12%, transparent); border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+        .ch-btn { padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.85em; font-weight: 500; transition: all 0.15s; color: inherit; }
+        .ch-btn:hover { filter: brightness(1.1); }
+        .ch-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .ch-btn-primary { background: #6366f1; color: white; }
+        .ch-btn-danger { background: transparent; color: #e53e3e; border: 1px solid #e53e3e33; }
+        .ch-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .ch-dot-green { background: #22c55e; box-shadow: 0 0 6px #22c55e66; }
+        .ch-dot-red { background: #ef4444; }
+        .ch-dot-gray { background: #888; }
+        .ch-label { font-size: 0.7em; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+        .ch-stat { text-align: center; padding: 8px 0; }
+        .ch-stat-value { font-size: 1.6em; font-weight: 700; line-height: 1; color: #6366f1; }
+        .ch-stat-label { font-size: 0.7em; opacity: 0.5; margin-top: 4px; }
+        .ch-adapter { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: color-mix(in srgb, currentColor 4%, transparent); margin-bottom: 6px; }
+        .ch-conv { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px; background: color-mix(in srgb, currentColor 4%, transparent); margin-bottom: 4px; font-size: 0.8em; }
+        .ch-msg { padding: 10px 14px; border-radius: 8px; font-size: 0.85em; margin-top: 12px; }
+        .ch-msg-success { background: #22c55e18; border: 1px solid #22c55e33; color: #16a34a; }
+        .ch-msg-error { background: #ef444418; border: 1px solid #ef444433; color: #dc2626; }
+        .ch-msg-info { background: #6366f118; border: 1px solid #6366f133; color: #6366f1; }
+        .ch-fade-in { animation: ch-fadeIn 0.3s ease; }
+        .ch-platform-icon { width: 20px; height: 20px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; flex-shrink: 0; }
+        .ch-tg { background: #0088cc; }
+        .ch-dc { background: #5865f2; }
+        .ch-wa { background: #25d366; }
+        @keyframes ch-fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div x-data class="ch">
+        <template x-if="$store.channelsPlugin">
+            <div x-init="$store.channelsPlugin.onOpen()" x-destroy="$store.channelsPlugin.cleanup()">
+
+                <!-- Header -->
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;">
+                        <rect width="24" height="24" rx="6" fill="#6366f1"/>
+                        <path d="M6 9h12M6 15h8" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="18" cy="15" r="2" fill="white"/>
+                    </svg>
+                    <div>
+                        <h2 style="margin:0; font-size:1.1em;">Channels</h2>
+                        <p style="margin:0; font-size:0.75em; opacity:0.5;">Unified messaging across Telegram, Discord & WhatsApp</p>
+                    </div>
+                </div>
+
+                <!-- Bus Status -->
+                <div class="ch-card">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span class="ch-dot" :class="$store.channelsPlugin.running ? 'ch-dot-green' : 'ch-dot-red'"></span>
+                        <div style="flex:1;">
+                            <strong style="font-size:0.9em;" x-text="$store.channelsPlugin.running ? 'Bus Running' : 'Bus Stopped'"></strong>
+                            <template x-if="$store.channelsPlugin.running">
+                                <div style="font-size:0.75em; opacity:0.5;">
+                                    <span x-text="$store.channelsPlugin.connectedCount"></span> adapter(s) connected
+                                </div>
+                            </template>
+                        </div>
+                        <template x-if="$store.channelsPlugin.lastRefreshed">
+                            <span style="font-size:0.65em; opacity:0.35;" x-text="$store.channelsPlugin.lastRefreshed"></span>
+                        </template>
+                        <template x-if="!$store.channelsPlugin.running">
+                            <button class="ch-btn ch-btn-primary"
+                                    :disabled="$store.channelsPlugin.starting"
+                                    @click="$store.channelsPlugin.start()">
+                                <span x-text="$store.channelsPlugin.starting ? 'Starting...' : 'Start'"></span>
+                            </button>
+                        </template>
+                        <template x-if="$store.channelsPlugin.running">
+                            <button class="ch-btn ch-btn-danger"
+                                    :disabled="$store.channelsPlugin.stopping"
+                                    @click="$store.channelsPlugin.stop()">
+                                <span x-text="$store.channelsPlugin.stopping ? 'Stopping...' : 'Stop'"></span>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <template x-if="$store.channelsPlugin.running">
+                    <div class="ch-fade-in" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:12px;">
+                        <div class="ch-card ch-stat">
+                            <div class="ch-stat-value" x-text="$store.channelsPlugin.connectedCount"></div>
+                            <div class="ch-stat-label">Connected</div>
+                        </div>
+                        <div class="ch-card ch-stat">
+                            <div class="ch-stat-value" x-text="$store.channelsPlugin.adapterList.length"></div>
+                            <div class="ch-stat-label">Adapters</div>
+                        </div>
+                        <div class="ch-card ch-stat">
+                            <div class="ch-stat-value" x-text="$store.channelsPlugin.activeConversations"></div>
+                            <div class="ch-stat-label">Conversations</div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Adapters -->
+                <template x-if="$store.channelsPlugin.running && $store.channelsPlugin.adapterList.length > 0">
+                    <div class="ch-card ch-fade-in">
+                        <div class="ch-label" style="margin-bottom:8px;">Adapters</div>
+                        <template x-for="adapter in $store.channelsPlugin.adapterList" :key="adapter.name">
+                            <div class="ch-adapter" style="flex-wrap:wrap;">
+                                <div class="ch-platform-icon"
+                                     :class="adapter.name === 'telegram' ? 'ch-tg' : adapter.name === 'discord' ? 'ch-dc' : adapter.name === 'whatsapp' ? 'ch-wa' : ''"
+                                     x-text="adapter.name.charAt(0).toUpperCase()"></div>
+                                <div style="flex:1; min-width:0;">
+                                    <strong style="font-size:0.85em; text-transform:capitalize;" x-text="adapter.name"></strong>
+                                    <template x-if="adapter.bot_info">
+                                        <div style="font-size:0.72em; opacity:0.5; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
+                                             x-text="$store.channelsPlugin.botLabel(adapter)"></div>
+                                    </template>
+                                </div>
+                                <span class="ch-dot" :class="adapter.connected ? 'ch-dot-green' : 'ch-dot-red'"></span>
+                                <span style="font-size:0.75em;" x-text="adapter.connected ? 'connected' : 'disconnected'"></span>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- Conversations -->
+                <template x-if="$store.channelsPlugin.running && $store.channelsPlugin.conversations.length > 0">
+                    <div class="ch-card ch-fade-in">
+                        <div class="ch-label" style="margin-bottom:8px;">Active Conversations</div>
+                        <template x-for="conv in $store.channelsPlugin.conversations" :key="conv.conversation_key">
+                            <div class="ch-conv">
+                                <div class="ch-platform-icon"
+                                     :class="conv.platform === 'telegram' ? 'ch-tg' : conv.platform === 'discord' ? 'ch-dc' : conv.platform === 'whatsapp' ? 'ch-wa' : ''"
+                                     x-text="conv.platform.charAt(0).toUpperCase()"></div>
+                                <div style="flex:1; min-width:0;">
+                                    <div style="font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
+                                         x-text="conv.channel_id"></div>
+                                    <div style="font-size:0.85em; opacity:0.5;"
+                                         x-text="conv.message_count + ' messages' + (conv.thread_id ? ' (thread: ' + conv.thread_id + ')' : '')"></div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- Empty state -->
+                <template x-if="$store.channelsPlugin.running && $store.channelsPlugin.adapterList.length === 0">
+                    <div class="ch-card ch-fade-in" style="opacity:0.7; text-align:center; padding:24px;">
+                        <p style="margin:0 0 8px 0; font-size:0.9em;">No adapters configured</p>
+                        <p style="margin:0; font-size:0.75em; opacity:0.5;">Add credentials in Settings to connect Telegram, Discord, or WhatsApp</p>
+                    </div>
+                </template>
+
+                <!-- Quick Start (when stopped) -->
+                <template x-if="!$store.channelsPlugin.running">
+                    <div class="ch-card ch-fade-in" style="opacity:0.7;">
+                        <div class="ch-label" style="margin-bottom:8px;">Quick Start</div>
+                        <ol style="margin:0; padding-left:20px; font-size:0.8em; line-height:1.8;">
+                            <li>Go to Settings and add your bot tokens</li>
+                            <li>Enable the adapters you want (Telegram, Discord, WhatsApp)</li>
+                            <li>Start the bus — Agent Zero handles the rest</li>
+                        </ol>
+                    </div>
+                </template>
+
+                <!-- Message Toast -->
+                <template x-if="$store.channelsPlugin.message">
+                    <div class="ch-msg ch-fade-in"
+                         :class="'ch-msg-' + ($store.channelsPlugin.message.type || 'info')"
+                         x-text="$store.channelsPlugin.message.text"
+                         x-init="setTimeout(() => $store.channelsPlugin.message = null, 4000)">
+                    </div>
+                </template>
+
+            </div>
+        </template>
+    </div>
+</body>
+</html>

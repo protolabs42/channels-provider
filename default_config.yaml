@@ -1,0 +1,49 @@
+# Channels Plugin — Default Configuration
+# Platform adapters are disabled until credentials are provided.
+
+auto_start: true
+history_per_conversation: 50
+
+# Telegram adapter
+telegram_enabled: false
+telegram_bot_token: ""
+telegram_allowed_chats: ""       # comma-separated chat IDs, empty = all
+telegram_parse_mode: "Markdown"  # Markdown | HTML
+
+# Telegram behavior
+telegram_typing_enabled: true
+telegram_reaction_enabled: true
+telegram_reaction_seen: "\U0001F440"       # 👀 on receipt
+telegram_reaction_processing: "\U0001F914" # 🤔 while agent thinks
+telegram_reaction_done: "\U0001F44D"       # 👍 response sent
+telegram_reaction_error: "\U0001F494"      # 💔 on timeout/failure
+telegram_response_mode: "auto"             # auto | all | mentions | replies | commands_only
+
+# Telegram webhook (leave empty for long-polling)
+telegram_webhook_url: ""
+telegram_webhook_port: 8443
+telegram_webhook_path: "/webhook/telegram"
+
+# Telegram bot commands
+telegram_commands: '[{"command":"help","description":"Show help"},{"command":"status","description":"Bot status"}]'
+telegram_handle_commands_internally: "help,status,forget"
+
+# Rate limits
+telegram_cooldown_seconds: 0       # per-user cooldown, 0 = disabled
+telegram_max_concurrent: 3         # max parallel agent contexts
+
+# Per-chat overrides (JSON)
+telegram_chat_overrides: "{}"      # { "chat_id": { "response_mode": "all", "system_prompt": "..." } }
+
+# Discord adapter
+discord_enabled: false
+discord_bot_token: ""
+discord_allowed_guilds: ""       # comma-separated guild IDs, empty = all
+discord_allowed_channels: ""     # comma-separated channel IDs, empty = all
+
+# WhatsApp adapter (via WhatsApp Business API / Baileys)
+whatsapp_enabled: false
+whatsapp_phone_id: ""
+whatsapp_access_token: ""
+whatsapp_verify_token: ""
+whatsapp_webhook_port: 8402
