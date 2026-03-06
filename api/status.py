@@ -1,7 +1,7 @@
 """Channels plugin status and control API handler."""
 import sys
 from pathlib import Path
-from python.helpers.api import ApiHandler, Request, Response
+from helpers.api import ApiHandler, Request, Response
 
 _plugin_root = Path(__file__).parent.parent
 if str(_plugin_root) not in sys.path:
@@ -38,7 +38,7 @@ class StatusHandler(ApiHandler):
         }
 
     async def _start(self) -> dict:
-        from python.helpers import plugins
+        from helpers import plugins
         from channels_helpers.runner import start_daemon
 
         config = plugins.get_plugin_config("channels") or {}

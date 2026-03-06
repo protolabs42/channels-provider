@@ -3,7 +3,7 @@ import subprocess
 import sys
 import logging
 from pathlib import Path
-from python.helpers.extension import Extension
+from helpers.extension import Extension
 from agent import LoopData
 
 logger = logging.getLogger("channels")

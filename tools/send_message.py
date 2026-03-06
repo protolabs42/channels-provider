@@ -12,7 +12,7 @@ with the agent's final response. Use this tool for:
 import sys
 from pathlib import Path
 
-from python.helpers.tool import Tool, Response
+from helpers.tool import Tool, Response
 
 _plugin_root = Path(__file__).resolve().parents[1]
 if str(_plugin_root) not in sys.path:
