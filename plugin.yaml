@@ -1,3 +1,4 @@
+name: channels_provider
 title: Channels
 description: Unified messaging adapter for Telegram, Discord, and WhatsApp. Routes platform messages to Agent Zero and agent responses back to platforms.
 version: 0.1.0
