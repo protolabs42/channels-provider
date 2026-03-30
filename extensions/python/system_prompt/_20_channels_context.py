@@ -12,7 +12,7 @@ if str(_plugin_root) not in sys.path:
 
 class ChannelsContext(Extension):
     async def execute(self, loop_data: LoopData = LoopData(), **kwargs):
-        config = plugins.get_plugin_config("channels", self.agent)
+        config = plugins.get_plugin_config("channels_provider", self.agent)
         if not config:
             return
 
