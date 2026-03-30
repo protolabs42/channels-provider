@@ -20,10 +20,10 @@ class ChannelsDeps(Extension):
             return
         _CHECKED = True
 
-        # Ensure usr/lib is on sys.path so imports find volume-installed packages
-        lib_str = str(_USR_LIB)
-        if lib_str not in sys.path:
-            sys.path.insert(0, lib_str)
+        # Do NOT unconditionally add usr/lib to sys.path.
+        # Only add it after a successful pip install to that location.
+        # Adding stale packages (e.g. pydantic_core compiled for wrong Python
+        # version) to the front of sys.path breaks imports for the entire process.
 
         # Find requirements.txt relative to plugin root
         plugin_root = Path(__file__).resolve().parents[3]
@@ -61,6 +61,9 @@ class ChannelsDeps(Extension):
                 timeout=120,
             )
             if result.returncode == 0:
+                # Only add to sys.path after successful install
+                if lib_str not in sys.path:
+                    sys.path.insert(0, lib_str)
                 logger.info("[deps] installed to persistent volume")
             else:
                 logger.error(f"[deps] pip install failed: {result.stderr}")

@@ -41,7 +41,7 @@ class StatusHandler(ApiHandler):
         from helpers import plugins
         from channels_helpers.runner import start_daemon
 
-        config = plugins.get_plugin_config("channels") or {}
+        config = plugins.get_plugin_config("channels_provider") or {}
 
         try:
             start_daemon(config)

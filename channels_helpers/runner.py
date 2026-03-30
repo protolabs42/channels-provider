@@ -16,6 +16,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import threading
+import traceback
 from typing import Any
 
 from channels_helpers.bus import ChannelBus, ensure_bus, get_bus
@@ -91,7 +92,7 @@ def start_daemon(config: dict[str, Any]) -> ChannelBus:
             try:
                 future.result(timeout=10)
             except Exception as e:
-                logger.error(f"[runner] startup failed: {e}")
+                logger.error(f"[runner] startup failed: {type(e).__name__}: {e}\n{traceback.format_exc()}")
 
         return bus
 
@@ -134,10 +135,10 @@ def _register_adapters(bus: ChannelBus, config: dict[str, Any]) -> None:
             )
             bus.register(adapter)
             logger.info("[runner] registered Telegram adapter")
-        except ImportError:
-            logger.warning("[runner] Telegram adapter not yet implemented")
+        except ImportError as e:
+            logger.error(f"[runner] Telegram adapter import failed: {e}\n{traceback.format_exc()}")
         except Exception as e:
-            logger.error(f"[runner] failed to create Telegram adapter: {e}")
+            logger.error(f"[runner] failed to create Telegram adapter: {type(e).__name__}: {e}\n{traceback.format_exc()}")
 
     # Discord
     if config.get("discord_enabled") and config.get("discord_bot_token"):
@@ -153,8 +154,8 @@ def _register_adapters(bus: ChannelBus, config: dict[str, Any]) -> None:
             )
             bus.register(adapter)
             logger.info("[runner] registered Discord adapter")
-        except ImportError:
-            logger.warning("[runner] Discord adapter not yet implemented")
+        except ImportError as e:
+            logger.error(f"[runner] Discord adapter import failed: {e}\n{traceback.format_exc()}")
         except Exception as e:
             logger.error(f"[runner] failed to create Discord adapter: {e}")
 
@@ -173,8 +174,8 @@ def _register_adapters(bus: ChannelBus, config: dict[str, Any]) -> None:
             )
             bus.register(adapter)
             logger.info("[runner] registered WhatsApp adapter")
-        except ImportError:
-            logger.warning("[runner] WhatsApp adapter not yet implemented")
+        except ImportError as e:
+            logger.error(f"[runner] WhatsApp adapter import failed: {e}\n{traceback.format_exc()}")
         except Exception as e:
             logger.error(f"[runner] failed to create WhatsApp adapter: {e}")
 

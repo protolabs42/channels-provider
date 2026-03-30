@@ -132,6 +132,6 @@ export const store = createStore("channelsPlugin", {
 
     async _api(endpoint, body) {
         const { callJsonApi } = await import("/js/api.js");
-        return await callJsonApi(`plugins/channels/${endpoint}`, body);
+        return await callJsonApi(`plugins/channels_provider/${endpoint}`, body);
     },
 });
